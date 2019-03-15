@@ -12,8 +12,10 @@ classdef ThorlabsLNR50 < handle
 
 
   	POS_RANGE = [0 50]; % [mm]
-  	VEL_RANGE = [0 50]; % [mm/s]
-  	ACC_RANGE = [0 20]; % [mm2/s]
+		% 20 mm/s and mm/s² according to datasheet but software allows for more
+		VEL_RANGE = [0 50]; % [mm/s]
+  	ACC_RANGE = [0 50]; % [mm2/s]
+
 
 		DEFAULT_VEL = 50;            % [mm/s] Default velocity
 		DEFAULT_ACC = 20;            % [mm2/s] Default acceleration
@@ -88,9 +90,10 @@ classdef ThorlabsLNR50 < handle
         	workDone = TLS.DeviceNet.InitializeWaitHandler(); % Initialise Waithandler for timeout
         	TLS.DeviceNet.MoveTo(pos, workDone); % Move device to position via .NET interface
         	TLS.DeviceNet.Wait(TLS.TIME_OUT_MOVE);              % Wait for move to finish
+					% end
 				catch me % Cannot initialise device
-      		error(['Unable to Move device to ',num2str(pos)]);
-					rethrow me;
+      		short_warn(['Unable to Move device to ',num2str(pos)]);
+					rethrow(me);
     		end
 			end
 		end

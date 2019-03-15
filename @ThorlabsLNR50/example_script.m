@@ -1,12 +1,12 @@
-TLJ = ThorlabsLabJack();
-TLJ.Home();
+% TLS = ThorlabsLNR50();
+% TLS.needsHoming
+% TLS.pos
+% TLS.pos = 0;
 
-% set default speed and acc
-TLJ.vel = TLJ.DEFAULT_VEL;
-TLJ.acc = TLJ.DEFAULT_ACC;
-
-TLJ.pos = 25; % move to position you like...
-
-TLJ.Stop();
-
-TLJ.Disconnect();
+posRange = 20:0.25:30; % 10 mm, 250 um steps
+TLS.pos = posRange(1); % move to start
+for iPos = 1:numel(posRange)
+  fprintf('%i/%i\n',iPos,numel(posRange));
+  TLS.pos = posRange(iPos);
+end
+TLS.pos = mean(posRange); % move to center
