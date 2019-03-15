@@ -14,7 +14,7 @@ function Connect(TLS)
 
 		% CONNECT TO LAB JACK %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 		try
-		  deviceFound = strfind(serialNumbers{:},TLS.serialNr);
+			deviceFound =  any(strcmp(serialNumbers,TLS.serialNr));
 
 		  if deviceFound
 				fprintf('[Y-Stage] Device found...');
@@ -44,7 +44,7 @@ function Connect(TLS)
 			TLS.DeviceNet.EnableDevice();
 			pause(0.1);
 	    TLS.DeviceNet.LoadMotorConfiguration(TLS.serialNr);
-			
+
       % Initializes the current motor configuration.  This will load the
       % settings appropriate for the motor as defined in the
       % DeviceConfiguration settings. This should only be called once. Calling
