@@ -114,7 +114,7 @@ classdef motor < handle
             DeviceNet.ClearDeviceExceptions();  % Clear exceptions vua .NET interface
             DeviceNet.ResetConnection(serialNr) % Reset connection via .NET interface
         end
-        function home(h)              % Home device (must be done before any device move
+        function home(h)              % Home device (must be TLS.Done(); before any device move
             workDone=DeviceNet.InitializeWaitHandler();     % Initialise Waithandler for timeout
             DeviceNet.Home(workDone);                       % Home devce via .NET interface
             DeviceNet.Wait(TIMEOUTMOVE);                  % Wait for move to finish

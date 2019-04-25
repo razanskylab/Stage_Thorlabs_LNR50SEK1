@@ -1,9 +1,9 @@
-function Stop(TLJ)
+function Stop(TLS)
 
-	fprintf('[Y-Stage] Stopping device...');
+	TLS.VPrintF('[Y-Stage] Stopping device...');
 	try
-		TLJ.DeviceNet.StopImmediate();
-		done();
+		TLS.DeviceNet.StopImmediate();
+		TLS.Done();
 	catch ex
 		% Cannot initialise device
 		short_warn('[Y-Stage] Unable to stop device!');

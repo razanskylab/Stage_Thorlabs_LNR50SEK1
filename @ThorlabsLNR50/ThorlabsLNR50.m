@@ -1,21 +1,41 @@
-classdef ThorlabsLNR50 < handle
+classdef ThorlabsLNR50 < BaseHardwareClass
+
+	properties
+		serialNr(1,:) char = '';
+
+		pos(1,1) {mustBeNumeric};
+		vel(1,1) {mustBeNumeric};
+		acc(1,1) {mustBeNumeric};
+
+		% Net Properties
+	end
+
+	properties (SetAccess = private,Hidden)
+		DeviceNet;
+		DeviceManagerAssembly; % see Load_DLLs
+		MotorAssembly; % see Load_DLLs
+	end
+
+	properties (Dependent = true)
+		isConnected;
+		needsHoming;
+	end
+
+	properties (Constant)
+		POS_RANGE = [0 50]; % [mm]
+		% 20 mm/s and mm/s² according to datasheet but software allows for more
+		VEL_RANGE = [0 50]; % [mm/s]
+		ACC_RANGE = [0 50]; % [mm2/s]
+	end
 
 	properties (Constant, Hidden)
-
 		% path to DLL files (edit as appropriate)
 		DLL_PATH = 'C:\Program Files\Thorlabs\Kinesis\';
 
 		% DLL files to be loaded
-		DEVICE_MANAGER_DLL = 		'Thorlabs.MotionControl.DeviceManagerCLI.dll';
-		MOTOR_DLL = 'Thorlabs.MotionControl.Benchtop.StepperMotorCLI.dll';
+		DEVICE_MANAGER_DLL = 'Thorlabs.MotionControl.DeviceManagerCLI.dll';
+		MOTOR_DLL = 				 'Thorlabs.MotionControl.Benchtop.StepperMotorCLI.dll';
 		% MOTOR_DLL = 'Thorlabs.MotionControl.IntegratedStepperMotorsCLI.dll';
-
-
-  	POS_RANGE = [0 50]; % [mm]
-		% 20 mm/s and mm/s² according to datasheet but software allows for more
-		VEL_RANGE = [0 50]; % [mm/s]
-  	ACC_RANGE = [0 50]; % [mm2/s]
-
 
 		DEFAULT_VEL = 50;            % [mm/s] Default velocity
 		DEFAULT_ACC = 20;            % [mm2/s] Default acceleration
@@ -30,36 +50,22 @@ classdef ThorlabsLNR50 < handle
 		SET_DEFAULT_VEL_ACC = true;
 	end
 
-	properties
-		serialNr(1,:) char = '';
-
-		pos(1,1) {mustBeNumeric};
-		vel(1,1) {mustBeNumeric};
-		acc(1,1) {mustBeNumeric};
-
-		% Net Properties
-		DeviceNet;
-		DeviceManagerAssembly; % see Load_DLLs
-		MotorAssembly; % see Load_DLLs
-	end
-
-	properties (Dependent = true)
-		isConnected;
-		needsHoming;
-	end
-
+	% constructor & destructor methods %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	methods
-		function TLS = ThorlabsLNR50(varargin)
+		function TLS = ThorlabsLNR50(doConnect)
 			TLS.Load_DLLs;
-			if (nargin == 1) && ischar(varargin{1})
-				TLS.serialNr = varargin{1};
-			else
-				TLS.serialNr = TLS.DEFAUL_SERIAL_NR;
+			TLS.serialNr = TLS.DEFAUL_SERIAL_NR;
+
+			if (nargin == 0)
+				doConnect = TLS.DO_AUTO_CONNECT;
     	end
 
-			if TLS.DO_AUTO_CONNECT && ~TLS.isConnected
+			if doConnect && ~TLS.isConnected
 				TLS.Connect();
+			else
+				TLS.PrintF('[Y-Stage] Initialized but not connected yet.\n');
 			end
+
 			% home if needed and desired...
 			if TLS.DO_AUTO_HOME && TLS.isConnected && TLS.DeviceNet.NeedsHoming()
 				TLS.Home();
@@ -84,7 +90,7 @@ classdef ThorlabsLNR50 < handle
 		% Moves to position and waits until target positon is reached
 		function set.pos(TLS, pos)
 			if pos > max(TLS.POS_RANGE) || pos < min(TLS.POS_RANGE)
-				short_warn('Requested position out of range!');
+				short_warn('[Y-Stage] Requested position out of range!');
 			else
 				try
         	workDone = TLS.DeviceNet.InitializeWaitHandler(); % Initialise Waithandler for timeout
@@ -92,7 +98,7 @@ classdef ThorlabsLNR50 < handle
         	TLS.DeviceNet.Wait(TLS.TIME_OUT_MOVE);              % Wait for move to finish
 					% end
 				catch me % Cannot initialise device
-      		short_warn(['Unable to Move device to ',num2str(pos)]);
+      		short_warn(['[Y-Stage] Unable to Move device to ',num2str(pos)]);
 					rethrow(me);
     		end
 			end
@@ -107,7 +113,7 @@ classdef ThorlabsLNR50 < handle
 		% Sets target velocity of the stage
 		function set.vel(TLS, vel)
 			if vel > max(TLS.VEL_RANGE) || vel < min(TLS.VEL_RANGE)
-				short_warn('Requested velocity out of range!');
+				short_warn('[Y-Stage] Requested velocity out of range!');
 			else
 				velpars = TLS.DeviceNet.GetVelocityParams();
 				velpars.MaxVelocity = vel;
@@ -125,7 +131,7 @@ classdef ThorlabsLNR50 < handle
 		% Sets target acceleration of the stage
 		function set.acc(TLS, acc)
 			if acc > max(TLS.ACC_RANGE) || acc < min(TLS.ACC_RANGE)
-				short_warn('Requested velocity out of range!');
+				short_warn('[Y-Stage] Requested velocity out of range!');
 			else
 				velpars = TLS.DeviceNet.GetVelocityParams();
 				velpars.Acceleration = acc;
@@ -141,7 +147,7 @@ classdef ThorlabsLNR50 < handle
 
 		%%===========================================================================
     function isConnected = get.isConnected(TLS)
-      if isobject(TLS.DeviceNet) && TLS.DeviceNet.IsConnected();
+      if isobject(TLS.DeviceNet) && TLS.DeviceNet.IsConnected()
         isConnected = true;
       else
         isConnected = false;

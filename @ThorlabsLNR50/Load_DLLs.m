@@ -1,6 +1,7 @@
-function Load_DLLs(TLJ)
-	fprintf('[Y-Stage] Adding .NET assemblies...');
-	TLJ.DeviceManagerAssembly = NET.addAssembly([TLJ.DLL_PATH, TLJ.DEVICE_MANAGER_DLL]);
-	TLJ.MotorAssembly       = NET.addAssembly([TLJ.DLL_PATH, TLJ.MOTOR_DLL]);
-	done();
+function Load_DLLs(TLS)
+    tic;
+ 	TLS.VPrintF('[Y-Stage] Adding .NET assemblies...');
+	TLS.DeviceManagerAssembly = NET.addAssembly([TLS.DLL_PATH, TLS.DEVICE_MANAGER_DLL]);
+	TLS.MotorAssembly       = NET.addAssembly([TLS.DLL_PATH, TLS.MOTOR_DLL]);
+	TLS.Done();
 end

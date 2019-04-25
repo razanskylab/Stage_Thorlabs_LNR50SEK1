@@ -8,7 +8,7 @@ function Slow_Move(TLS,pos)
 		try
 			distance = abs(TLS.pos - pos);
 			waitTime = TLS.vel/TLS.acc*2 + (distance-(TLS.vel.^2/TLS.acc))./TLS.vel; % get travel time in seconds (ignore acceleration)
-			fprintf('[Y-Stage] Slow-moving to %2.1f mm @ %2.1f mm/s in %2.1fs\n',...
+			TLS.VPrintF('[Y-Stage] Slow-moving to %2.1f mm @ %2.1f mm/s in %2.1fs\n',...
 				pos,TLS.vel,waitTime);
 			waitTime = waitTime + SAFETY_MARGIN;
 			workDone = TLS.DeviceNet.InitializeWaitHandler(); % Initialise Waithandler for timeout

@@ -1,11 +1,12 @@
-function Disconnect(TLJ)
-	fprintf('[Y-Stage] Disconnecting device...');
+function Disconnect(TLS)
+	TLS.PrintF('[Y-Stage] Disconnecting device...');
 
-  if TLJ.isConnected
+  if TLS.isConnected
     try
-      TLJ.DeviceNet.StopPolling();  % Stop polling device via .NET interface
-      TLJ.DeviceNet.Disconnect();   % Disconnect device via .NET interface
-			done();
+			tic;
+      TLS.DeviceNet.StopPolling();  % Stop polling device via .NET interface
+      TLS.DeviceNet.Disconnect();   % Disconnect device via .NET interface
+			TLS.Done();
 		catch ex
 	 		% Cannot initialise device
 		  short_warn('[Y-Stage] Unable to disconnect device!');

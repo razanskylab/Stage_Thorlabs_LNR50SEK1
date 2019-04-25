@@ -14,17 +14,18 @@ function Connect(TLS)
 
 		% CONNECT TO LAB JACK %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 		try
+			tic;
 			deviceFound =  any(strcmp(serialNumbers,TLS.serialNr));
 
 		  if deviceFound
-				fprintf('[Y-Stage] Device found...');
+				TLS.VPrintF('[Y-Stage] Device found...');
 			else
 				short_warn('[Y-Stage] Device not found!');
 				return;
           end
 		  TLS.DeviceNet = Thorlabs.MotionControl.Benchtop.StepperMotorCLI.BenchtopStepperMotor.CreateBenchtopStepperMotor(TLS.serialNr);
 
-      fprintf('connecting...');
+      TLS.VPrintF('connecting...');
 		  % TLS.DeviceNet.ClearDeviceExceptions();
 		  % Clears the the last device exceptions if any.
 		  TLS.DeviceNet.ConnectDevice(TLS.serialNr);
@@ -34,7 +35,7 @@ function Connect(TLS)
 			TLS.DeviceNet = TLS.DeviceNet.GetChannel(1);
 			pause(0.1);
 
-			fprintf('initializing...');
+			TLS.VPrintF('initializing...');
 		  if ~TLS.DeviceNet.IsSettingsInitialized() % Cannot initialise device
 	      error('[Y-Stage] Unable to initialise device!');
 		  end
@@ -54,7 +55,7 @@ function Connect(TLS)
       % settings prior to returning as defined by the MotorConfiguration
       % settings
 
-			done();
+			TLS.Done();
 		catch ex
 	 		% Cannot initialise device
 		  short_warn('[Y-Stage] Unable to initialise device!');
